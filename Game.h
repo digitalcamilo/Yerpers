@@ -12,7 +12,7 @@
 #include "BSP.h"
 /*********************************************** Includes ********************************************************************/
 
-#define PLAYER 1
+#define PLAYER 0
 
 #pragma pack ( push, 1)
 /*
@@ -41,7 +41,12 @@ typedef struct
 #pragma pack ( pop )
 
 void JoinGame();
-void CreateGame();
+void SendDataToHost();
+void ReceiveDataFroHost();
 
+
+void CreateGame();
+void SendDataToClient();
+void ReceiveDataFromClient();
 
 #endif /* GAME_H_ */
