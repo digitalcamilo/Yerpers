@@ -1,15 +1,21 @@
-/*
- * RGBLeds.h
- *
- *  Created on: Nov 14, 2019
- *      Author: voyager
- */
-
-#ifndef RGBLEDSH
-#define RGBLEDSH
-#include <msp432p401r.h>
-#include "driverlib.h"
 #include "msp.h"
+
+#define UNIT_OFF 0x0000
+#define LS0 0x06
+#define LS1 0x07
+#define LS2 0x08
+#define LS3 0x09
+#define PSC0 0x02
+#define PSC1 0x04
+#define PWM0 0x03
+#define PWM1 0x05
+#define LED_AUTO 0x16
+#define PWM_AUTO 0x12
+#define SLAVE_ADDR 0x60
+#define BITRATE 7 //~26 = 3MHz(Clk speed)/115200 Hz(baudrate)
+
+#ifndef RGBLEDS_H_
+#define RGBLEDS_H_
 
 /* Enums for RGB LEDs */
 typedef enum device
@@ -19,43 +25,10 @@ typedef enum device
     RED = 2
 } unit_desig;
 
-typedef struct rgb_stuct
-{
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-} RGB_Data;
-
-/*
- * i2c_write
- * Performs a basic write operation to relevant chip
- */
-void i2c_write(uint8_t chip_addr, uint8_t data1, uint8_t data2);
-
-/*
- * LP3943_SetRGB
- * This function will set the relevant PWM settings to display
- * the requested color on the indexed LED
- */
-void LP3943_SetRGB(RGB_Data color, uint16_t LED_DATA, bool primary);
-
-/*
- * LP3943_ColorSet
- * This function will set the frequencies and PWM duty cycle
- * for each register of the specified unit.
- */
-void LP3943_ColorSet(uint32_t unit, uint8_t freq, uint8_t duty_cycle, bool primary );
-
-/*
- * LP3943_LedModeSet
- * This function will set each of the LEDs to the desired operating
- * mode. The operating modes are on, off, PWM1, PWM2.
- */
-void LP3943_LedModeSet(uint32_t unit, uint16_t LED_DATA, uint8_t mode);
-
-/*
- * Performs necessary initializations for RGB LEDS
- */
+void LP3943_ColorSet(uint32_t unit, uint32_t LED_MODE, uint32_t PWM_DATA);
+void LP3943_LedModeSet(uint32_t unit, uint16_t LED_DATA);
 void init_RGBLEDS();
+void write_I2C(uint32_t data, uint8_t addr);
 
-#endif / RGBLEDSH */
+
+#endif /* RGBLEDS_H_ */
