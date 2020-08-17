@@ -12,6 +12,8 @@
 #include "BSP.h"
 /*********************************************** Includes ********************************************************************/
 
+semaphore_t CC3100Semaphore;
+
 #define PLAYER 1
 
 #pragma pack ( push, 1)
