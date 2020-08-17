@@ -54,6 +54,9 @@ void JoinGame() {
     // kill self
     //G8RTOS_KillSelf();
 
+    // add semaphores
+    G8RTOS_InitSemaphore(&CC3100Semaphore, 1);
+
     while(1);
 }
 
@@ -139,6 +142,9 @@ void CreateGame() {
     //gamestate.player.acknowledge = true;
     fillPacket(&gamestate, packet_buffer);
     SendData(packet_buffer, gamestate.player.IP_address, sizeof(packet_buffer));
+
+    // add semaphores
+    G8RTOS_InitSemaphore(&CC3100Semaphore, 1);
 
     while(1);
 }

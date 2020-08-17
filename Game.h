@@ -12,7 +12,9 @@
 #include "BSP.h"
 /*********************************************** Includes ********************************************************************/
 
-#define PLAYER 0
+semaphore_t CC3100Semaphore;
+
+#define PLAYER 1
 
 #pragma pack ( push, 1)
 /*
