@@ -12,9 +12,16 @@
 #include "BSP.h"
 /*********************************************** Includes ********************************************************************/
 
-semaphore_t CC3100Semaphore;
-
 #define PLAYER 1
+
+/* Size of game arena */
+#define ARENA_MIN_X                  0
+#define ARENA_MAX_X                  320
+#define ARENA_MIN_Y                  0
+#define ARENA_MAX_Y                  240
+
+semaphore_t CC3100Semaphore;
+semaphore_t LCDMutex;
 
 #pragma pack ( push, 1)
 /*
@@ -50,5 +57,8 @@ void ReceiveDataFroHost();
 void CreateGame();
 void SendDataToClient();
 void ReceiveDataFromClient();
+
+void InitBoardState();
+void IdleThread();
 
 #endif /* GAME_H_ */

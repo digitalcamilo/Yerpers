@@ -51,13 +51,21 @@ void JoinGame() {
     // turn on LED
     BITBAND_PERI(P1->OUT, 0) = !BITBAND_PERI(P1->OUT, 0);
 
-    // kill self
-    //G8RTOS_KillSelf();
-
     // add semaphores
     G8RTOS_InitSemaphore(&CC3100Semaphore, 1);
+    G8RTOS_InitSemaphore(&LCDMutex, 1);
 
-    while(1);
+    InitBoardState();
+
+    // add threads
+    //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
+    G8RTOS_AddThread(ReceiveDataFromClient, 100, "ReceiveDataFromClient");
+    G8RTOS_AddThread(SendDataToClient, 150, "SendDataToClient");
+    //G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
+    G8RTOS_AddThread(IdleThread, 255, "IdleThread");
+
+    // kill self
+    G8RTOS_KillSelf();
 }
 
 /*
@@ -145,8 +153,19 @@ void CreateGame() {
 
     // add semaphores
     G8RTOS_InitSemaphore(&CC3100Semaphore, 1);
+    G8RTOS_InitSemaphore(&LCDMutex, 1);
 
-    while(1);
+    // initialize the arena, paddles, scores
+    InitBoardState();
+
+    // add threads
+    //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
+    G8RTOS_AddThread(ReceiveDataFromClient, 100, "ReceiveDataFromClient");
+    G8RTOS_AddThread(SendDataToClient, 150, "SendDataToClient");
+    //G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
+    G8RTOS_AddThread(IdleThread, 255, "IdleThread");
+
+    G8RTOS_KillSelf();
 }
 
 /*
@@ -200,4 +219,35 @@ void ReceiveDataFromClient()
 
         G8RTOS_Sleep(2);
     }
+}
+
+void InitBoardState()
+{
+    G8RTOS_WaitSemaphore(&LCDMutex);
+
+    LCD_Clear(LCD_GRAY);
+
+    //char scores[3];
+
+    //snprintf(scores, 3, "%.2u", gamestate.overallScores[0]);
+    //LCD_Text(MIN_SCREEN_X + 10, MAX_SCREEN_Y - 20, scores, LCD_RED);
+
+    //snprintf(scores, 3, "%.2u", gamestate.overallScores[1]);
+    //LCD_Text(MIN_SCREEN_X + 10, MIN_SCREEN_Y + 5, scores, LCD_BLUE);
+
+    // Draw ground
+    LCD_DrawRectangle(ARENA_MIN_X, ARENA_MAX_X, ARENA_MAX_Y - 5, ARENA_MAX_Y, LCD_BLACK);
+
+    // Draw clouds
+
+    G8RTOS_SignalSemaphore(&LCDMutex);
+
+    // Draw players
+    //DrawPlayer(&gamestate.players[0]);
+    //DrawPlayer(&gamestate.players[1]);
+}
+
+void IdleThread()
+{
+    while(1);
 }
