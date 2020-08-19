@@ -236,7 +236,7 @@ void InitBoardState()
     //LCD_Text(MIN_SCREEN_X + 10, MIN_SCREEN_Y + 5, scores, LCD_BLUE);
 
     // Draw ground
-    LCD_DrawRectangle(ARENA_MIN_X, ARENA_MAX_X, ARENA_MAX_Y - 5, ARENA_MAX_Y, LCD_BLACK);
+    LCD_DrawRectangle(ARENA_MIN_X, ARENA_MAX_X, ARENA_MAX_Y - 5, ARENA_MAX_Y, LCD_PURPLE);
 
     // Draw clouds
 
