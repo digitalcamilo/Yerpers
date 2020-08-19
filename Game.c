@@ -109,7 +109,7 @@ void SendDataToHost()
         gamestate.player.displacementX = 0;
         gamestate.player.displacementY = 0;
 
-        OS_Sleep(5);
+        G8RTOS_Sleep(5);
     }
 }
 
