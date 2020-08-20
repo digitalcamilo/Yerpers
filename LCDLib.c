@@ -94,6 +94,48 @@ static void LCD_initSPI()
 /************************************  Public Functions  *******************************************/
 
 /*******************************************************************************
+ * Function Name  : LCD_DrawRectangleWithColor
+ * Description    : Draw a rectangle as the arrays indexed specified color
+ * Input          : xStart, xEnd, yStart, yEnd, Color
+ * Output         : None
+ * Return         : None
+ * Attention      : Must draw from left to right, top to bottom!
+ *******************************************************************************/
+void LCD_DrawRectangleWithColor(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t Color[])
+{
+    // Optimization complexity: O(64 + 2N) Bytes Written
+
+    /* Check special cases for out of bounds */
+    if (xStart < MIN_SCREEN_X)
+        xStart = MIN_SCREEN_X;
+    if (xEnd > MAX_SCREEN_X)
+        xEnd = MAX_SCREEN_X;
+    if (yStart < MIN_SCREEN_Y)
+        yStart = MIN_SCREEN_Y;
+    if (yEnd > MAX_SCREEN_Y)
+        yEnd = MAX_SCREEN_Y;
+
+    /* Set window area for high-speed RAM write */
+    LCD_WriteReg(HOR_ADDR_START_POS, yStart);
+    LCD_WriteReg(HOR_ADDR_END_POS, yEnd);
+    LCD_WriteReg(VERT_ADDR_START_POS, xStart);
+    LCD_WriteReg(VERT_ADDR_END_POS, xEnd);
+
+    /* Set cursor */
+    LCD_SetCursor(xStart, yStart);
+
+    /* Set index to GRAM */
+    LCD_WriteIndex(GRAM);
+
+    /* Send out data only to the entire area */
+    SPI_CS_LOW;
+    LCD_Write_Data_Start();
+    for (int i = 0; i < (xEnd - xStart + 1) * (yEnd - yStart + 1); i++)
+        LCD_Write_Data_Only(Color[i]);
+    SPI_CS_HIGH;
+}
+
+/*******************************************************************************
  * Function Name  : LCD_DrawRectangle
  * Description    : Draw a rectangle as the specified color
  * Input          : xStart, xEnd, yStart, yEnd, Color

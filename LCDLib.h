@@ -130,6 +130,16 @@ typedef struct Point {
  *******************************************************************************/
 void LCD_DrawRectangle(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t Color);
 
+/*******************************************************************************
+ * Function Name  : LCD_DrawRectangleWithColor
+ * Description    : Draw a rectangle as the arrays indexed specified color
+ * Input          : xStart, xEnd, yStart, yEnd, Color
+ * Output         : None
+ * Return         : None
+ * Attention      : Must draw from left to right, top to bottom!
+ *******************************************************************************/
+void LCD_DrawRectangleWithColor(int16_t xStart, int16_t xEnd, int16_t yStart, int16_t yEnd, uint16_t Color[]);
+
 /******************************************************************************
 * Function Name  : PutChar
 * Description    : Lcd screen displays a character
