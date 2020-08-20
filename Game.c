@@ -81,7 +81,6 @@ uint16_t blueplayer[504] = {
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_BLUE, LCD_BLUE, LCD_CYAN, LCD_CYAN, LCD_BLUE, LCD_BLUE, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN
 };
 
-
 GameState_t gamestate, packet;
 uint8_t packet_buffer[sizeof(gamestate)];
 
