@@ -140,8 +140,8 @@ void JoinGame() {
 
     // add threads
     //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
-    G8RTOS_AddThread(ReceiveDataFromHost, 100, "ReceiveDataFromClient");
-    G8RTOS_AddThread(SendDataToHost, 150, "SendDataToClient");
+    G8RTOS_AddThread(ReceiveDataFromHost, 100, "ReceiveDataFromHost");
+    G8RTOS_AddThread(SendDataToHost, 150, "SendDataToHost");
     //G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
     G8RTOS_AddThread(IdleThread, 254, "IdleThread");
 

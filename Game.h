@@ -51,7 +51,7 @@ typedef struct
 
 void JoinGame();
 void SendDataToHost();
-void ReceiveDataFroHost();
+void ReceiveDataFromHost();
 
 
 void CreateGame();
