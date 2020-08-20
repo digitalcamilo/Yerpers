@@ -52,6 +52,7 @@
 #define LCD_ORANGE         0xFD20
 #define LCD_PINK           0xfdba
 #define LCD_OLIVE          0xdfe4
+#define LCD_BROWN          0x79e0
 
 /* ILI 9325 registers definition */
 #define READ_ID_CODE                        0x00
