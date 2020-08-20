@@ -60,5 +60,6 @@ void ReceiveDataFromClient();
 
 void InitBoardState();
 void IdleThread();
+void drawClouds(int16_t x, int16_t y);
 
 #endif /* GAME_H_ */

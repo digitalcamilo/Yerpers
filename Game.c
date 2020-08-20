@@ -221,11 +221,23 @@ void ReceiveDataFromClient()
     }
 }
 
+void drawClouds(int16_t x, int16_t y)
+{
+    LCD_DrawRectangle(25 + x, 35 + x, 5 + y, 10 + y, LCD_WHITE);
+    LCD_DrawRectangle(20 + x, 35 + x, 10 + y, 15 + y, LCD_WHITE);
+    LCD_DrawRectangle(55 + x, 60 + x, 10 + y, 15 + y, LCD_WHITE);
+    LCD_DrawRectangle(20 + x, 40 + x, 15 + y, 20 + y, LCD_WHITE);
+    LCD_DrawRectangle(50 + x, 60 + x, 15 + y, 20 + y, LCD_WHITE);
+    LCD_DrawRectangle(15 + x, 65 + x, 20 + y, 25 + y, LCD_WHITE);
+    LCD_DrawRectangle(10 + x, 70 + x, 25 + y, 30 + y, LCD_WHITE);
+    LCD_DrawRectangle(0 + x, 80 + x, 30 + y, 33 + y, LCD_WHITE);
+}
+
 void InitBoardState()
 {
     G8RTOS_WaitSemaphore(&LCDMutex);
 
-    LCD_Clear(LCD_GRAY);
+    LCD_Clear(LCD_CYAN);
 
     //char scores[3];
 
@@ -236,9 +248,18 @@ void InitBoardState()
     //LCD_Text(MIN_SCREEN_X + 10, MIN_SCREEN_Y + 5, scores, LCD_BLUE);
 
     // Draw ground
-    LCD_DrawRectangle(ARENA_MIN_X, ARENA_MAX_X, ARENA_MAX_Y - 5, ARENA_MAX_Y, LCD_PURPLE);
+    LCD_DrawRectangle(ARENA_MIN_X, ARENA_MAX_X, ARENA_MAX_Y - 5, ARENA_MAX_Y, LCD_BROWN);
+    LCD_DrawRectangle(60, 100, ARENA_MAX_Y - 55, ARENA_MAX_Y - 50, LCD_BROWN);
+    LCD_DrawRectangle(220, 260, ARENA_MAX_Y - 55, ARENA_MAX_Y - 50, LCD_BROWN);
+    LCD_DrawRectangle(140, 180, ARENA_MAX_Y - 105, ARENA_MAX_Y - 100, LCD_BROWN);
 
     // Draw clouds
+    drawClouds(0, 0);
+    drawClouds(30, 15);
+    drawClouds(100, 12);
+    drawClouds(150, 35);
+    drawClouds(200, 5);
+    drawClouds(230, 17);
 
     G8RTOS_SignalSemaphore(&LCDMutex);
 
