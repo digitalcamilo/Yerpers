@@ -381,6 +381,8 @@ void updateObjects()
             }
         }
     }
+
+    G8RTOS_Sleep(20);
 }
 
 void InitBoardState()
