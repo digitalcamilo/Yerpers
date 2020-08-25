@@ -380,9 +380,8 @@ void updateObjects()
                 prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
             }
         }
+        G8RTOS_Sleep(20);
     }
-
-    G8RTOS_Sleep(20);
 }
 
 void InitBoardState()
