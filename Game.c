@@ -374,12 +374,15 @@ void updateObjects()
     {
         for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
             if( (gamestate.players[i].currentCenterX != prevPlayers[i].centerX) && (gamestate.players[i].currentCenterY != prevPlayers[i].centerY) ){
+                G8RTOS_WaitSemaphore(LCDMutex);
                 ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
                 DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
                 prevPlayers[i].centerX = gamestate.players[i].currentCenterX;
                 prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
+                G8RTOS_SignalSemaphore(LCDMutex);
             }
         }
+
         G8RTOS_Sleep(20);
     }
 }
