@@ -53,13 +53,8 @@ typedef struct
 void JoinGame();
 void SendDataToHost();
 void ReceiveDataFromHost();
-<<<<<<< HEAD
 void ReadJoystickHost();
 
-=======
-
-// Host Threads
->>>>>>> f85f2b7557424451274a56bbb370d8d4497bb2e2
 void CreateGame();
 void SendDataToClient();
 void ReceiveDataFromClient();
