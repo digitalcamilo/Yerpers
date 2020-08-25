@@ -233,19 +233,6 @@ void CreateGame() {
     // copy player attributes including
     gamestate.player = packet.player;
 
-    // turn on LED indicating connection with client
-    BITBAND_PERI(P1->OUT, 0) = !BITBAND_PERI(P1->OUT, 0);
-
-    // acknowledge to client that player has joined
-    gamestate.player.joined = true;
-    //gamestate.player.acknowledge = true;
-    fillPacket(&gamestate, packet_buffer);
-    SendData(packet_buffer, gamestate.player.IP_address, sizeof(packet_buffer));
-
-    // add semaphores
-    G8RTOS_InitSemaphore(&CC3100Semaphore, 1);
-    G8RTOS_InitSemaphore(&LCDMutex, 1);
-
     // init player values
     // host
     gamestate.players[0].currentCenterX = 294;
@@ -260,6 +247,19 @@ void CreateGame() {
     gamestate.gameDone = false;
     gamestate.winner = false;
     for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) gamestate.overallScores[i] = 0;
+
+    // turn on LED indicating connection with client
+    BITBAND_PERI(P1->OUT, 0) = !BITBAND_PERI(P1->OUT, 0);
+
+    // acknowledge to client that player has joined
+    gamestate.player.joined = true;
+    //gamestate.player.acknowledge = true;
+    fillPacket(&gamestate, packet_buffer);
+    SendData(packet_buffer, gamestate.player.IP_address, sizeof(packet_buffer));
+
+    // add semaphores
+    G8RTOS_InitSemaphore(&CC3100Semaphore, 1);
+    G8RTOS_InitSemaphore(&LCDMutex, 1);
 
     // initialize the arena, paddles, scores
     InitBoardState();
@@ -376,7 +376,7 @@ void updateObjects()
     while(1)
     {
         for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
-            DrawPlayer(prevPlayers[i].centerX, prevPlayers[i].centerY, LCD_CYAN);
+            ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
             DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
             prevPlayers[i].centerX = gamestate.players[i].currentCenterX;
             prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
@@ -417,6 +417,11 @@ void InitBoardState()
 void DrawPlayer(uint16_t x, uint16_t y, uint16_t player[])
 {
     LCD_DrawRectangleWithColor(x-6, x+7, y-21, y+14, player);
+}
+
+void ErasePlayer(uint16_t x, uint16_t y)
+{
+    LCD_DrawRectangle(x-6, x+7, y-21, y+14, LCD_CYAN);
 }
 
 void IdleThread()

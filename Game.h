@@ -79,6 +79,7 @@ void ReadJoystickClient();
 void InitBoardState();
 void IdleThread();
 void DrawPlayer(uint16_t x, uint16_t y, uint16_t player[]);
+void ErasePlayer(uint16_t x, uint16_t y);
 void drawClouds(int16_t x, int16_t y);
 void updateObjects();
 
