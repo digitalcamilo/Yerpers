@@ -3,7 +3,7 @@
 #include "G8RTOS_IPC.h"
 #include <driverlib.h>
 
-uint16_t redplayer[504] = {
+uint16_t redplayer[SIZE_OF_PLAYER] = {
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_RED, LCD_RED, LCD_RED, LCD_RED, LCD_RED, LCD_RED, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN,
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_RED, LCD_RED, LCD_RED, LCD_RED, LCD_RED, LCD_RED, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN,
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_RED, LCD_RED, LCD_BLACK, LCD_BLACK, LCD_RED, LCD_RED, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN,
@@ -42,7 +42,7 @@ uint16_t redplayer[504] = {
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_RED, LCD_RED, LCD_CYAN, LCD_CYAN, LCD_RED, LCD_RED, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN
 };
 
-uint16_t blueplayer[504] = {
+uint16_t blueplayer[SIZE_OF_PLAYER] = {
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN,
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_BLUE, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN,
    LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_BLUE, LCD_BLUE, LCD_BLACK, LCD_BLACK, LCD_BLUE, LCD_BLUE, LCD_CYAN, LCD_CYAN, LCD_CYAN, LCD_CYAN,
@@ -134,7 +134,6 @@ void JoinGame() {
     G8RTOS_InitSemaphore(&LCDMutex, 1);
 
     InitBoardState();
-    DrawPlayer(26, 220, blueplayer);
 
     // add threads
     //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
@@ -209,9 +208,9 @@ void ReadJoystickClient() {
     while (1) {
         GetJoystickCoordinates(&xCord, &yCord);
 
-        if (xCord < -1800) gamestate.player.displacement = 4;
-        else if (xCord > 1800) gamestate.player.displacement = -4;
-        else gamestate.player.displacement = 0;
+        if (xCord < -1800) gamestate.player.displacementX = 4;
+        else if (xCord > 1800) gamestate.player.displacementX = -4;
+        else gamestate.player.displacementX = 0;
 
         // Sleep 10ms
         G8RTOS_Sleep(10);
@@ -231,10 +230,6 @@ void CreateGame() {
         gamestate = packet;
     }
 
-
-    //while (ReceiveData(packet_buffer, sizeof(packet_buffer)) < 0);
-    //emptyPacket(&packet, &packet_buffer);
-
     // copy player attributes including
     gamestate.player = packet.player;
 
@@ -251,9 +246,24 @@ void CreateGame() {
     G8RTOS_InitSemaphore(&CC3100Semaphore, 1);
     G8RTOS_InitSemaphore(&LCDMutex, 1);
 
+    // init player values
+    // host
+    gamestate.players[0].currentCenterX = 294;
+    gamestate.players[0].currentCenterY = 220;
+    for(int i=0; i<SIZE_OF_PLAYER; i++) gamestate.players[0].player[i] = redplayer[i];
+
+    // client
+    gamestate.players[1].currentCenterX = 26;
+    gamestate.players[1].currentCenterY = 220;
+    for(int i=0; i<SIZE_OF_PLAYER; i++) gamestate.players[1].player[i] = blueplayer[i];
+
+    gamestate.gameDone = false;
+    gamestate.winner = false;
+    for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) gamestate.overallScores[i] = 0;
+
     // initialize the arena, paddles, scores
     InitBoardState();
-    DrawPlayer(294, 220, redplayer);
+
 
     // add threads
     //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
@@ -354,25 +364,40 @@ void drawClouds(int16_t x, int16_t y)
     LCD_DrawRectangle(0 + x, 80 + x, 30 + y, 33 + y, LCD_WHITE);
 }
 
+void updateObjects()
+{
+    PrevPlayer_t prevPlayers[MAX_NUM_OF_PLAYERS];
+
+    prevPlayers[0].centerX = gamestate.players[0].currentCenterX;
+    prevPlayers[0].centerY = gamestate.players[0].currentCenterY;
+    prevPlayers[1].centerX = gamestate.players[1].currentCenterX;
+    prevPlayers[1].centerY = gamestate.players[1].currentCenterY;
+
+    while(1)
+    {
+        for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
+            DrawPlayer(prevPlayers[i].centerX, prevPlayers[i].centerY, LCD_CYAN);
+            DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
+            prevPlayers[i].centerX = gamestate.players[i].currentCenterX;
+            prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
+        }
+    }
+}
+
 void InitBoardState()
 {
     G8RTOS_WaitSemaphore(&LCDMutex);
 
     LCD_Clear(LCD_CYAN);
 
-    //char scores[3];
-
-    //snprintf(scores, 3, "%.2u", gamestate.overallScores[0]);
-    //LCD_Text(MIN_SCREEN_X + 10, MAX_SCREEN_Y - 20, scores, LCD_RED);
-
-    //snprintf(scores, 3, "%.2u", gamestate.overallScores[1]);
-    //LCD_Text(MIN_SCREEN_X + 10, MIN_SCREEN_Y + 5, scores, LCD_BLUE);
-
     // Draw ground
     LCD_DrawRectangle(ARENA_MIN_X, ARENA_MAX_X, ARENA_MAX_Y - 5, ARENA_MAX_Y, LCD_BROWN);
     LCD_DrawRectangle(60, 100, ARENA_MAX_Y - 55, ARENA_MAX_Y - 50, LCD_BROWN);
     LCD_DrawRectangle(220, 260, ARENA_MAX_Y - 55, ARENA_MAX_Y - 50, LCD_BROWN);
     LCD_DrawRectangle(140, 180, ARENA_MAX_Y - 105, ARENA_MAX_Y - 100, LCD_BROWN);
+
+    // draw players
+    for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
 
     // Draw clouds
     drawClouds(0, 0);
