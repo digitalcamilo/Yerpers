@@ -136,7 +136,7 @@ void JoinGame() {
     InitBoardState();
 
     // add threads
-    //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
+    G8RTOS_AddThread(updateObjects, 50, "updateObjects");
     G8RTOS_AddThread(ReceiveDataFromHost, 100, "ReceiveDataFromHost");
     G8RTOS_AddThread(SendDataToHost, 150, "SendDataToHost");
     G8RTOS_AddThread(ReadJoystickClient, 200, "ReadJoystickClient");
@@ -266,7 +266,7 @@ void CreateGame() {
 
 
     // add threads
-    //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
+    G8RTOS_AddThread(updateObjects, 50, "updateObjects");
     G8RTOS_AddThread(ReceiveDataFromClient, 100, "ReceiveDataFromClient");
     G8RTOS_AddThread(SendDataToClient, 150, "SendDataToClient");
     G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
@@ -322,7 +322,7 @@ void ReceiveDataFromClient()
         emptyPacket(&packet, &packet_buffer);
 
         //  Updates the players current center with the received displacement
-        //gamestate.players[1].currentCenter += gamestate.player.displacement;
+        gamestate.players[1].currentCenterX += gamestate.player.displacementX;
 
         G8RTOS_Sleep(2);
     }
@@ -345,10 +345,7 @@ void ReadJoystickHost() {
         G8RTOS_Sleep(10);
 
         // Update position of host paddle
-        //gamestate.players[0].currentCenter += displacement;
-
-        //if (gamestate.players[0].currentCenter - PADDLE_LEN_D2 <= ARENA_MIN_X) gamestate.players[0].currentCenter = ARENA_MIN_X + PADDLE_LEN_D2 + 1;
-        //else if (gamestate.players[0].currentCenter + PADDLE_LEN_D2 >= ARENA_MAX_X) gamestate.players[0].currentCenter = ARENA_MAX_X - PADDLE_LEN_D2 - 1;
+        gamestate.players[0].currentCenterX += displacement;
     }
 }
 
@@ -376,10 +373,12 @@ void updateObjects()
     while(1)
     {
         for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
-            ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
-            DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
-            prevPlayers[i].centerX = gamestate.players[i].currentCenterX;
-            prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
+            if( (gamestate.players[i].currentCenterX != prevPlayers[i].centerX) && (gamestate.players[i].currentCenterY != prevPlayers[i].centerY) ){
+                ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
+                DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
+                prevPlayers[i].centerX = gamestate.players[i].currentCenterX;
+                prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
+            }
         }
     }
 }
@@ -408,10 +407,6 @@ void InitBoardState()
     drawClouds(230, 17);
 
     G8RTOS_SignalSemaphore(&LCDMutex);
-
-    // Draw players
-    //DrawPlayer(&gamestate.players[0]);
-    //DrawPlayer(&gamestate.players[1]);
 }
 
 void DrawPlayer(uint16_t x, uint16_t y, uint16_t player[])
