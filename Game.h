@@ -41,10 +41,10 @@ typedef struct
 typedef struct
 {
     SpecificPlayerInfo_t player;
-    //bool winner;
-    //bool gameDone;
+    bool winner;
+    bool gameDone;
     //uint8_t LEDScores[2];
-    //uint8_t overallScores[2];
+    uint8_t overallScores[2];
 } GameState_t;
 
 #pragma pack ( pop )
@@ -52,11 +52,12 @@ typedef struct
 void JoinGame();
 void SendDataToHost();
 void ReceiveDataFromHost();
-
+void ReadJoystickHost();
 
 void CreateGame();
 void SendDataToClient();
 void ReceiveDataFromClient();
+void ReadJoystickClient();
 
 void InitBoardState();
 void IdleThread();

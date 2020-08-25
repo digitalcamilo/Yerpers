@@ -202,6 +202,23 @@ void SendDataToHost()
     }
 }
 
+/*
+ * Thread to read client's joystick
+ */
+void ReadJoystickClient() {
+    int16_t xCord, yCord;
+
+    while (1) {
+        GetJoystickCoordinates(&xCord, &yCord);
+
+        if (xCord < -1800) gamestate.player.displacement = 4;
+        else if (xCord > 1800) gamestate.player.displacement = -4;
+        else gamestate.player.displacement = 0;
+
+        // Sleep 10ms
+        G8RTOS_Sleep(10);
+    }
+}
 
 //================================== Host Threads
 
@@ -299,6 +316,30 @@ void ReceiveDataFromClient()
         //gamestate.players[1].currentCenter += gamestate.player.displacement;
 
         G8RTOS_Sleep(2);
+    }
+}
+
+/*
+ * Thread to read host's joystick
+ */
+void ReadJoystickHost() {
+    int16_t xCord, yCord, displacement;
+
+    while (1) {
+        GetJoystickCoordinates(&xCord, &yCord);
+
+        if (xCord < -1800) displacement = 4;
+        else if (xCord > 1800) displacement = -4;
+        else displacement = 0;
+
+        // Sleep to give fair advantage to client
+        G8RTOS_Sleep(10);
+
+        // Update position of host paddle
+        //gamestate.players[0].currentCenter += displacement;
+
+        //if (gamestate.players[0].currentCenter - PADDLE_LEN_D2 <= ARENA_MIN_X) gamestate.players[0].currentCenter = ARENA_MIN_X + PADDLE_LEN_D2 + 1;
+        //else if (gamestate.players[0].currentCenter + PADDLE_LEN_D2 >= ARENA_MAX_X) gamestate.players[0].currentCenter = ARENA_MAX_X - PADDLE_LEN_D2 - 1;
     }
 }
 
