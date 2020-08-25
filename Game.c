@@ -140,7 +140,7 @@ void JoinGame() {
     //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
     G8RTOS_AddThread(ReceiveDataFromHost, 100, "ReceiveDataFromHost");
     G8RTOS_AddThread(SendDataToHost, 150, "SendDataToHost");
-    //G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
+    G8RTOS_AddThread(ReadJoystickClient, 200, "ReadJoystickClient");
     G8RTOS_AddThread(IdleThread, 254, "IdleThread");
 
     // kill self
@@ -259,7 +259,7 @@ void CreateGame() {
     //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
     G8RTOS_AddThread(ReceiveDataFromClient, 100, "ReceiveDataFromClient");
     G8RTOS_AddThread(SendDataToClient, 150, "SendDataToClient");
-    //G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
+    G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
     G8RTOS_AddThread(IdleThread, 254, "IdleThread");
 
     G8RTOS_KillSelf();
