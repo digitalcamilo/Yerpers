@@ -134,9 +134,7 @@ void JoinGame() {
     G8RTOS_InitSemaphore(&LCDMutex, 1);
 
     InitBoardState();
-
-    LCD_DrawRectangleWithColor(20, 33, 240-41, 240-6, redplayer);
-    LCD_DrawRectangleWithColor(287, 300, 240-41, 240-6, blueplayer);
+    DrawPlayer(26, 220, blueplayer);
 
     // add threads
     //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
@@ -238,6 +236,7 @@ void CreateGame() {
 
     // initialize the arena, paddles, scores
     InitBoardState();
+    DrawPlayer(294, 220, redplayer);
 
     // add threads
     //G8RTOS_AddThread(DrawObjects, 50, "DrawObjects");
@@ -347,6 +346,11 @@ void InitBoardState()
     // Draw players
     //DrawPlayer(&gamestate.players[0]);
     //DrawPlayer(&gamestate.players[1]);
+}
+
+void DrawPlayer(uint16_t x, uint16_t y, uint16_t player[])
+{
+    LCD_DrawRectangleWithColor(x-6, x+7, y-21, y+14, player);
 }
 
 void IdleThread()

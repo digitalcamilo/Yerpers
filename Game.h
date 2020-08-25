@@ -49,17 +49,20 @@ typedef struct
 
 #pragma pack ( pop )
 
+//Client Threads
 void JoinGame();
 void SendDataToHost();
 void ReceiveDataFromHost();
 
-
+// Host Threads
 void CreateGame();
 void SendDataToClient();
 void ReceiveDataFromClient();
 
+//Common Threads
 void InitBoardState();
 void IdleThread();
+void DrawPlayer(uint16_t x, uint16_t y, uint16_t player[]);
 void drawClouds(int16_t x, int16_t y);
 
 #endif /* GAME_H_ */
