@@ -122,8 +122,8 @@ void JoinGame() {
 
     // send player info to host & wait for server response
     //do SendData(packet_buffer, HOST_IP_ADDR, sizeof(packet_buffer));
-    while(ReceiveData(woh_buffer, sizeof(woh_buffer)) < 0){
 
+    while(ReceiveData(woh_buffer, sizeof(woh_buffer)) < 0){
         SendData(packet_buffer, HOST_IP_ADDR, sizeof(packet_buffer));
     };
 
@@ -170,14 +170,13 @@ void ReceiveDataFromHost()
         G8RTOS_SignalSemaphore(&CC3100Semaphore);
 
         // Empties the packets content
-        emptyPacket(&packet, &packet_buffer);
-        gamestate = packet;
+        emptyPacket(&gamestate, &packet_buffer);
 
         //Check if game is done
 //        if (gamestate.gameDone)
 //            G8RTOS_AddThread(EndOfGameClient, 1, "EndGameClient");
 
-        G8RTOS_Sleep(2);
+        G8RTOS_Sleep(5);
     }
 }
 
@@ -200,7 +199,7 @@ void SendDataToHost()
         gamestate.player.displacementX = 0;
         gamestate.player.displacementY = 0;
 
-        G8RTOS_Sleep(5);
+        G8RTOS_Sleep(2);
     }
 }
 
@@ -288,7 +287,7 @@ void SendDataToClient()
     while (1)
     {
         // Fills the packet for the client
-        fillPacket(&gamestate, &packet);
+        fillPacket(&gamestate, &packet_buffer);
 
         // Sends the packet to the client
         G8RTOS_WaitSemaphore(&CC3100Semaphore);
@@ -327,7 +326,9 @@ void ReceiveDataFromClient()
         emptyPacket(&packet, &packet_buffer);
 
         //  Updates the players current center with the received displacement
-        gamestate.players[1].currentCenterX += packet.player.displacementX;
+
+        if( (gamestate.players[1].currentCenterX - 6 > 6) && (gamestate.players[1].currentCenterX + 7 < 312) )
+            gamestate.players[1].currentCenterX += packet.player.displacementX;
 
         G8RTOS_Sleep(2);
     }
@@ -350,7 +351,8 @@ void ReadJoystickHost() {
         G8RTOS_Sleep(10);
 
         // Update position of host paddle
-        gamestate.players[0].currentCenterX += displacement;
+        if( (gamestate.players[0].currentCenterX - 6 > 6) && (gamestate.players[0].currentCenterX + 7 < 312) )
+            gamestate.players[0].currentCenterX += displacement;
     }
 }
 
@@ -379,13 +381,13 @@ void updateObjects()
     {
         for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
             if(gamestate.players[i].currentCenterX != prevPlayers[i].centerX){
-                G8RTOS_WaitSemaphore(LCDMutex);
+                G8RTOS_WaitSemaphore(&LCDMutex);
                 ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
                 if(gamestate.players[i].color == player1) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, redplayer);
                 else DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, blueplayer);
+                G8RTOS_SignalSemaphore(&LCDMutex);
                 prevPlayers[i].centerX = gamestate.players[i].currentCenterX;
                 prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
-                G8RTOS_SignalSemaphore(LCDMutex);
             }
         }
 
