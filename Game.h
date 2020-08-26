@@ -12,7 +12,7 @@
 #include "BSP.h"
 /*********************************************** Includes ********************************************************************/
 #define MAX_NUM_OF_PLAYERS  2
-#define PLAYER 1
+#define PLAYER 0
 #define SIZE_OF_PLAYER 504
 
 /* Size of game arena */

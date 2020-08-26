@@ -325,10 +325,9 @@ void ReceiveDataFromClient()
 
         // Empties the packets content
         emptyPacket(&packet, &packet_buffer);
-        gamestate = packet;
 
         //  Updates the players current center with the received displacement
-        gamestate.players[1].currentCenterX += gamestate.player.displacementX;
+        gamestate.players[1].currentCenterX += packet.player.displacementX;
 
         G8RTOS_Sleep(2);
     }
@@ -379,7 +378,7 @@ void updateObjects()
     while(1)
     {
         for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
-            if( (gamestate.players[i].currentCenterX != prevPlayers[i].centerX)){
+            if(gamestate.players[i].currentCenterX != prevPlayers[i].centerX){
                 G8RTOS_WaitSemaphore(LCDMutex);
                 ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
                 if(gamestate.players[i].color == player1) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, redplayer);
