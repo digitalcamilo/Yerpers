@@ -18,7 +18,7 @@
  * +=====+=====+=====+=====+=====+=====+=====+=====+=====+
  */
 
-#define MAX_THREADS 24
+#define MAX_THREADS 20
 #define MAXPTHREADS 6
 #define STACKSIZE 512
 #define OSINT_PRIORITY 7
