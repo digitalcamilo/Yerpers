@@ -237,12 +237,12 @@ void CreateGame() {
     // host
     gamestate.players[0].currentCenterX = 294;
     gamestate.players[0].currentCenterY = 220;
-    for(int i=0; i<SIZE_OF_PLAYER; i++) gamestate.players[0].player[i] = redplayer[i];
+    gamestate.players[0].color = player1;
 
     // client
     gamestate.players[1].currentCenterX = 26;
     gamestate.players[1].currentCenterY = 220;
-    for(int i=0; i<SIZE_OF_PLAYER; i++) gamestate.players[1].player[i] = blueplayer[i];
+    gamestate.players[1].color = player2;
 
     gamestate.gameDone = false;
     gamestate.winner = false;
@@ -376,7 +376,8 @@ void updateObjects()
             if( (gamestate.players[i].currentCenterX != prevPlayers[i].centerX) && (gamestate.players[i].currentCenterY != prevPlayers[i].centerY) ){
                 G8RTOS_WaitSemaphore(LCDMutex);
                 ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
-                DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
+                if(gamestate.players[i].color == player1) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, redplayer);
+                else DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, blueplayer);
                 prevPlayers[i].centerX = gamestate.players[i].currentCenterX;
                 prevPlayers[i].centerY = gamestate.players[i].currentCenterY;
                 G8RTOS_SignalSemaphore(LCDMutex);
@@ -400,7 +401,10 @@ void InitBoardState()
     LCD_DrawRectangle(140, 180, ARENA_MAX_Y - 105, ARENA_MAX_Y - 100, LCD_BROWN);
 
     // draw players
-    for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
+    for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
+        if(gamestate.players[i].color == player1) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, redplayer);
+        else DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, blueplayer);
+    }
 
     // Draw clouds
     drawClouds(0, 0);

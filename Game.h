@@ -12,7 +12,7 @@
 #include "BSP.h"
 /*********************************************** Includes ********************************************************************/
 #define MAX_NUM_OF_PLAYERS  2
-#define PLAYER 1
+#define PLAYER 0
 #define SIZE_OF_PLAYER 504
 
 /* Size of game arena */
@@ -25,6 +25,9 @@ semaphore_t CC3100Semaphore;
 semaphore_t LCDMutex;
 
 #pragma pack ( push, 1)
+
+typedef enum { player1, player2 } playerColor_t;
+
 /*
  * Struct to be sent from the client to the host
  */
@@ -43,7 +46,7 @@ typedef struct
 {
     int16_t currentCenterX;
     int16_t currentCenterY;
-    uint16_t player[SIZE_OF_PLAYER];
+    playerColor_t color;
 } GeneralPlayerInfo_t;
 
 typedef struct
