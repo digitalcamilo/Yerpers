@@ -82,7 +82,7 @@ uint16_t blueplayer[SIZE_OF_PLAYER] = {
 };
 
 GameState_t gamestate, packet;
-uint8_t packet_buffer[sizeof(gamestate)];
+uint8_t packet_buffer[sizeof(gamestate)], woh_buffer[sizeof(gamestate)];
 
 /* Function to fill in a packet to be sent over through WiFi */
 static inline void fillPacket(GameState_t * packet, uint8_t * buffer) {
@@ -121,9 +121,13 @@ void JoinGame() {
     fillPacket(&gamestate, &packet_buffer);
 
     // send player info to host & wait for server response
-    do SendData(packet_buffer, HOST_IP_ADDR, sizeof(packet_buffer));
-    while(ReceiveData(packet_buffer, sizeof(packet_buffer)) < 0);
-    emptyPacket(&packet, &packet_buffer);
+    //do SendData(packet_buffer, HOST_IP_ADDR, sizeof(packet_buffer));
+    while(ReceiveData(woh_buffer, sizeof(woh_buffer)) < 0){
+
+        SendData(packet_buffer, HOST_IP_ADDR, sizeof(packet_buffer));
+    };
+
+    emptyPacket(&packet, &woh_buffer);
     gamestate = packet;
 
     // turn on LED
@@ -167,6 +171,7 @@ void ReceiveDataFromHost()
 
         // Empties the packets content
         emptyPacket(&packet, &packet_buffer);
+        gamestate = packet;
 
         //Check if game is done
 //        if (gamestate.gameDone)
@@ -320,6 +325,7 @@ void ReceiveDataFromClient()
 
         // Empties the packets content
         emptyPacket(&packet, &packet_buffer);
+        gamestate = packet;
 
         //  Updates the players current center with the received displacement
         gamestate.players[1].currentCenterX += gamestate.player.displacementX;
@@ -373,7 +379,7 @@ void updateObjects()
     while(1)
     {
         for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
-            if( (gamestate.players[i].currentCenterX != prevPlayers[i].centerX) && (gamestate.players[i].currentCenterY != prevPlayers[i].centerY) ){
+            if( (gamestate.players[i].currentCenterX != prevPlayers[i].centerX)){
                 G8RTOS_WaitSemaphore(LCDMutex);
                 ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
                 if(gamestate.players[i].color == player1) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, redplayer);
