@@ -389,7 +389,7 @@ void updateObjects()
 
 void InitBoardState()
 {
-    //G8RTOS_WaitSemaphore(&LCDMutex);
+    G8RTOS_WaitSemaphore(&LCDMutex);
 
     LCD_Clear(LCD_CYAN);
 
@@ -403,14 +403,14 @@ void InitBoardState()
     for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, gamestate.players[i].player);
 
     // Draw clouds
-    //drawClouds(0, 0);
-    //drawClouds(30, 15);
-    //drawClouds(100, 12);
-    //drawClouds(150, 35);
-    //drawClouds(200, 5);
-    //drawClouds(230, 17);
+    drawClouds(0, 0);
+    drawClouds(30, 15);
+    drawClouds(100, 12);
+    drawClouds(150, 35);
+    drawClouds(200, 5);
+    drawClouds(230, 17);
 
-    //G8RTOS_SignalSemaphore(&LCDMutex);
+    G8RTOS_SignalSemaphore(&LCDMutex);
 }
 
 void DrawPlayer(uint16_t x, uint16_t y, uint16_t player[])

@@ -74,7 +74,7 @@ extern "C" {
  * Values for below macros shall be modified per the access-point's (AP) properties
  * SimpleLink device will connect to following AP when the application is executed
  */
-#define CHAVEZ_WIFI
+#define CAMILO_WIFI
 
 #ifdef CAMILO
 
@@ -105,6 +105,22 @@ extern "C" {
 #define SEC_TYPE_AP_MODE   SL_SEC_TYPE_OPEN    /* Can take SL_SEC_TYPE_WEP or
                                                 * SL_SEC_TYPE_WPA as well */
 #endif
+
+#ifdef CAMILO_WIFI
+
+#define SSID_NAME       "ECE House"         /* Access point name to connect to. */
+#define SEC_TYPE        SL_SEC_TYPE_WPA_WPA2    /* Security type of the Access piont */
+//#define SEC_TYPE        SL_SEC_TYPE_OPEN    /* Security type of the Access piont */
+#define PASSKEY         "ligmaballs"                  /* Password in case of secure AP */
+#define PASSKEY_LEN     pal_Strlen(PASSKEY)  /* Password length in case of secure AP */
+
+/* Configuration of the device when it comes up in AP mode */
+#define SSID_AP_MODE       "ECE House"       /* SSID of the CC3100 in AP mode */
+#define PASSWORD_AP_MODE   "ligmaballs"                  /* Password of CC3100 AP */
+#define SEC_TYPE_AP_MODE   SL_SEC_TYPE_OPEN    /* Can take SL_SEC_TYPE_WEP or
+                                                * SL_SEC_TYPE_WPA as well */
+#endif
+
 
 /*
  * Values for below macros shall be modified based on current time
