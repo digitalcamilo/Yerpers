@@ -327,8 +327,10 @@ void ReceiveDataFromClient()
 
         //  Updates the players current center with the received displacement
 
-        if( (gamestate.players[1].currentCenterX - 6 > 6) && (gamestate.players[1].currentCenterX + 7 < 312) )
-            gamestate.players[1].currentCenterX += packet.player.displacementX;
+        gamestate.players[1].currentCenterX += packet.player.displacementX;
+
+        if( (gamestate.players[1].currentCenterX < 8) || (gamestate.players[1].currentCenterX > 313 ) )
+                    gamestate.players[1].currentCenterX -= packet.player.displacementX;
 
         G8RTOS_Sleep(2);
     }
@@ -351,8 +353,10 @@ void ReadJoystickHost() {
         G8RTOS_Sleep(10);
 
         // Update position of host paddle
-        if( (gamestate.players[0].currentCenterX - 6 > 6) && (gamestate.players[0].currentCenterX + 7 < 312) )
-            gamestate.players[0].currentCenterX += displacement;
+        gamestate.players[0].currentCenterX += displacement;
+
+        if( (gamestate.players[0].currentCenterX < 8) || (gamestate.players[0].currentCenterX > 313) )
+            gamestate.players[0].currentCenterX -= displacement;
     }
 }
 
