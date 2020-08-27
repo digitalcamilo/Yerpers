@@ -73,12 +73,15 @@ void SendDataToHost();
 void ReceiveDataFromHost();
 void ReadJoystickHost();
 
+//Host Threads
 void CreateGame();
 void SendDataToClient();
 void ReceiveDataFromClient();
 void ReadJoystickClient();
 
 //Common Threads
+void Jump();
+void VerticalMovement();
 void InitBoardState();
 void IdleThread();
 void DrawPlayer(uint16_t x, uint16_t y, uint16_t player[]);

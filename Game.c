@@ -139,12 +139,15 @@ void JoinGame() {
 
     InitBoardState();
 
-    // add threads
+    // add normal threads
     G8RTOS_AddThread(updateObjects, 50, "updateObjects");
     G8RTOS_AddThread(ReceiveDataFromHost, 100, "ReceiveDataFromHost");
     G8RTOS_AddThread(SendDataToHost, 150, "SendDataToHost");
     G8RTOS_AddThread(ReadJoystickClient, 200, "ReadJoystickClient");
     G8RTOS_AddThread(IdleThread, 254, "IdleThread");
+
+    // add aperiodic threads
+    G8RTOS_AddAperiodicEvent(Jump, 2, PORT5_IRQn);
 
     // kill self
     G8RTOS_KillSelf();
@@ -212,8 +215,8 @@ void ReadJoystickClient() {
     while (1) {
         GetJoystickCoordinates(&xCord, &yCord);
 
-        if (xCord < -1800) gamestate.player.displacementX = 4;
-        else if (xCord > 1800) gamestate.player.displacementX = -4;
+        if (xCord < -1800) gamestate.player.displacementX = 2;
+        else if (xCord > 1800) gamestate.player.displacementX = -2;
         else gamestate.player.displacementX = 0;
 
         // Sleep 10ms
@@ -268,13 +271,15 @@ void CreateGame() {
     // initialize the arena, paddles, scores
     InitBoardState();
 
-
     // add threads
     G8RTOS_AddThread(updateObjects, 50, "updateObjects");
     G8RTOS_AddThread(ReceiveDataFromClient, 100, "ReceiveDataFromClient");
     G8RTOS_AddThread(SendDataToClient, 150, "SendDataToClient");
     G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
     G8RTOS_AddThread(IdleThread, 254, "IdleThread");
+
+    // add aperiodic threads
+    G8RTOS_AddAperiodicEvent(Jump, 2, PORT5_IRQn);
 
     G8RTOS_KillSelf();
 }
@@ -326,8 +331,8 @@ void ReceiveDataFromClient()
         emptyPacket(&packet, &packet_buffer);
 
         //  Updates the players current center with the received displacement
-
         gamestate.players[1].currentCenterX += packet.player.displacementX;
+        gamestate.players[1].currentCenterY += packet.player.displacementY;
 
         if( (gamestate.players[1].currentCenterX < 8) || (gamestate.players[1].currentCenterX > 313 ) )
                     gamestate.players[1].currentCenterX -= packet.player.displacementX;
@@ -345,8 +350,8 @@ void ReadJoystickHost() {
     while (1) {
         GetJoystickCoordinates(&xCord, &yCord);
 
-        if (xCord < -1800) displacement = 4;
-        else if (xCord > 1800) displacement = -4;
+        if (xCord < -1800) displacement = 2;
+        else if (xCord > 1800) displacement = -2;
         else displacement = 0;
 
         // Sleep to give fair advantage to client
@@ -357,6 +362,45 @@ void ReadJoystickHost() {
 
         if( (gamestate.players[0].currentCenterX < 8) || (gamestate.players[0].currentCenterX > 313) )
             gamestate.players[0].currentCenterX -= displacement;
+    }
+}
+
+
+/***********************************
+ *                                 *
+ *         Common Threads          *
+ *                                 *
+ ***********************************/
+
+void Jump()
+{
+    uint32_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P5);
+
+    if (status & GPIO_PIN4)
+    {
+        P5->IE &= ~BIT4;
+        G8RTOS_AddThread(VerticalMovement, 175, "VMovement");
+        return;
+    }
+
+    return;
+}
+
+void VerticalMovement()
+{
+    while(1)
+    {
+        gamestate.player.displacementY = 0;
+
+        for(int i = 0; i < 50; i++){
+            if(PLAYER == 0) gamestate.players[0].currentCenterY--;
+            else gamestate.player.displacementY--;
+            G8RTOS_Sleep(7);
+        }
+
+        P5->IFG &= ~BIT4;
+        P5->IE |= BIT4;
+        G8RTOS_KillSelf();
     }
 }
 
@@ -384,7 +428,7 @@ void updateObjects()
     while(1)
     {
         for(int i=0; i<MAX_NUM_OF_PLAYERS; i++) {
-            if(gamestate.players[i].currentCenterX != prevPlayers[i].centerX){
+            if(gamestate.players[i].currentCenterX != prevPlayers[i].centerX || gamestate.players[i].currentCenterY != prevPlayers[i].centerY){
                 G8RTOS_WaitSemaphore(&LCDMutex);
                 ErasePlayer(prevPlayers[i].centerX, prevPlayers[i].centerY);
                 if(gamestate.players[i].color == player1) DrawPlayer(gamestate.players[i].currentCenterX, gamestate.players[i].currentCenterY, redplayer);

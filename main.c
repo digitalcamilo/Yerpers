@@ -1,6 +1,7 @@
 #include "msp.h"
 #include "BSP.h"
 #include "Game.h"
+#include "Buttons.h"
 #include "LCDLib.h"
 #include "G8RTOS.h"
 #include "cc3100_usage.h"
@@ -13,6 +14,7 @@ void main(void)
 	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
 
 	G8RTOS_Init();
+	Port5InterInit();
 
 	// client
 	if(PLAYER == 1) G8RTOS_AddThread(&JoinGame, 1, "JoinGame");
