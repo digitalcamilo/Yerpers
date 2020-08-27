@@ -82,7 +82,7 @@ uint16_t blueplayer[SIZE_OF_PLAYER] = {
 };
 
 GameState_t gamestate, packet;
-uint8_t packet_buffer[sizeof(gamestate)], woh_buffer[sizeof(gamestate)];
+uint8_t packet_buffer[sizeof(gamestate)], woh_buffer[sizeof(gamestate)], movingUp, touchingGnd;
 
 /* Function to fill in a packet to be sent over through WiFi */
 static inline void fillPacket(GameState_t * packet, uint8_t * buffer) {
@@ -143,11 +143,12 @@ void JoinGame() {
     G8RTOS_AddThread(updateObjects, 50, "updateObjects");
     G8RTOS_AddThread(ReceiveDataFromHost, 100, "ReceiveDataFromHost");
     G8RTOS_AddThread(SendDataToHost, 150, "SendDataToHost");
+    G8RTOS_AddThread(Gravity, 190, "Gravity");
     G8RTOS_AddThread(ReadJoystickClient, 200, "ReadJoystickClient");
     G8RTOS_AddThread(IdleThread, 254, "IdleThread");
 
     // add aperiodic threads
-    G8RTOS_AddAperiodicEvent(Jump, 2, PORT5_IRQn);
+    //G8RTOS_AddAperiodicEvent(Jump, 2, PORT5_IRQn);
 
     // kill self
     G8RTOS_KillSelf();
@@ -219,6 +220,11 @@ void ReadJoystickClient() {
         else if (xCord > 1800) gamestate.player.displacementX = -4;
         else gamestate.player.displacementX = 0;
 
+        if ( (yCord < -1800) && (movingUp == 0) ) {
+            movingUp = 1;
+            G8RTOS_AddThread(VerticalMovement, 175, "VMovement");
+        }
+
         // Sleep 10ms
         G8RTOS_Sleep(10);
     }
@@ -275,11 +281,9 @@ void CreateGame() {
     G8RTOS_AddThread(updateObjects, 50, "updateObjects");
     G8RTOS_AddThread(ReceiveDataFromClient, 100, "ReceiveDataFromClient");
     G8RTOS_AddThread(SendDataToClient, 150, "SendDataToClient");
+    G8RTOS_AddThread(Gravity, 190, "Gravity");
     G8RTOS_AddThread(ReadJoystickHost, 200, "ReadJoystickHost");
     G8RTOS_AddThread(IdleThread, 254, "IdleThread");
-
-    // add aperiodic threads
-    G8RTOS_AddAperiodicEvent(Jump, 2, PORT5_IRQn);
 
     G8RTOS_KillSelf();
 }
@@ -354,6 +358,12 @@ void ReadJoystickHost() {
         else if (xCord > 1800) displacement = -4;
         else displacement = 0;
 
+        if ( (yCord < -1800) && !movingUp && touchingGnd) {
+            movingUp = 1;
+            touchingGnd = 0;
+            G8RTOS_AddThread(VerticalMovement, 175, "VMovement");
+        }
+
         // Sleep to give fair advantage to client
         G8RTOS_Sleep(10);
 
@@ -372,18 +382,33 @@ void ReadJoystickHost() {
  *                                 *
  ***********************************/
 
-void Jump()
+
+void Gravity()
 {
-    uint32_t status = GPIO_getEnabledInterruptStatus(GPIO_PORT_P5);
-
-    if (status & GPIO_PIN4)
+    uint16_t pixelHost, pixelClient;
+    while(1)
     {
-        P5->IE &= ~BIT4;
-        G8RTOS_AddThread(VerticalMovement, 175, "VMovement");
-        return;
-    }
+        if(!movingUp && !touchingGnd)
+        {
+            pixelHost = ReadPixelColor(gamestate.players[0].currentCenterX, gamestate.players[0].currentCenterY + 15);
+            pixelClient = ReadPixelColor(gamestate.players[1].currentCenterX, gamestate.players[1].currentCenterY + 15);
 
-    return;
+            if(PLAYER == 0) {
+                if(pixelHost == 0x01EF){ //on ground, change flag
+                    touchingGnd = 1;
+                }else{ //falling
+                    gamestate.players[0].currentCenterY += 1;
+                }
+            }else if(PLAYER == 1){
+                if(pixelClient == 0x01EF){ //on ground, change flag
+                    touchingGnd = 1;
+                }else{ //falling
+                    gamestate.player.displacementY += 1;
+                }
+            }
+        }
+        G8RTOS_Sleep(5);
+    }
 }
 
 void VerticalMovement()
@@ -392,14 +417,16 @@ void VerticalMovement()
     {
         gamestate.player.displacementY = 0;
 
-        for(int i = 0; i < 50; i++){
-            if(PLAYER == 0) gamestate.players[0].currentCenterY--;
-            else gamestate.player.displacementY--;
+        for(int i = 0; i < 13; i++){
+            if(PLAYER == 0) gamestate.players[0].currentCenterY -= 4;
+            else gamestate.player.displacementY -= 4;
             G8RTOS_Sleep(5);
         }
 
-        P5->IFG &= ~BIT4;
-        P5->IE |= BIT4;
+//        P5->IFG &= ~BIT4;
+//        P5->IE |= BIT4;
+        G8RTOS_Sleep(100);
+        movingUp = 0;
         G8RTOS_KillSelf();
     }
 }

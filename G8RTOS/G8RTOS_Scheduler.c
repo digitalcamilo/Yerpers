@@ -138,7 +138,12 @@ void G8RTOS_Scheduler()
     uint8_t currentMaxPriority = UINT8_MAX;
 
     /* set a temporary next thread */
-    tcb_t * tempNextThread = CurrentlyRunningThread;
+    tcb_t * tempNextThread;
+
+    if(!CurrentlyRunningThread->alive)
+        tempNextThread = CurrentlyRunningThread->nextTCB;
+    else
+        tempNextThread = CurrentlyRunningThread;
 
     /* traverse through tcb linked list until the highest priority thread is neither sleeping or blocked */
     for (int i = 0; i < NumberOfThreads; i++) {

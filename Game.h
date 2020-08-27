@@ -80,7 +80,7 @@ void ReceiveDataFromClient();
 void ReadJoystickClient();
 
 //Common Threads
-void Jump();
+void Gravity();
 void VerticalMovement();
 void InitBoardState();
 void IdleThread();
