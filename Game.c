@@ -82,7 +82,7 @@ uint16_t blueplayer[SIZE_OF_PLAYER] = {
 };
 
 GameState_t gamestate, packet;
-uint8_t packet_buffer[sizeof(gamestate)], woh_buffer[sizeof(gamestate)], movingUp, touchingGnd;
+uint8_t packet_buffer[sizeof(gamestate)], woh_buffer[sizeof(gamestate)], movingUp = 0, touchingGnd = 1;
 
 /* Function to fill in a packet to be sent over through WiFi */
 static inline void fillPacket(GameState_t * packet, uint8_t * buffer) {
@@ -220,8 +220,9 @@ void ReadJoystickClient() {
         else if (xCord > 1800) gamestate.player.displacementX = -4;
         else gamestate.player.displacementX = 0;
 
-        if ( (yCord < -1800) && (movingUp == 0) ) {
+        if ( (yCord < -1800) && !movingUp && touchingGnd) {
             movingUp = 1;
+            touchingGnd = 0;
             G8RTOS_AddThread(VerticalMovement, 175, "VMovement");
         }
 
