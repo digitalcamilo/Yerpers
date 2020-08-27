@@ -389,6 +389,7 @@ void Gravity()
     uint16_t pixelHost, pixelClient;
     while(1)
     {
+        pixelClient = ReadPixelColor(gamestate.players[1].currentCenterX, gamestate.players[1].currentCenterY + 15);
         if(!movingUp && !touchingGnd)
         {
             pixelHost = ReadPixelColor(gamestate.players[0].currentCenterX, gamestate.players[0].currentCenterY + 15);
@@ -401,10 +402,10 @@ void Gravity()
                     gamestate.players[0].currentCenterY += 1;
                 }
             }else if(PLAYER == 1){
-                if(pixelClient == 0x01EF){ //on ground, change flag
+                if(pixelClient == 0x01EF || pixelClient == 0x79E0){ //on ground, change flag
                     touchingGnd = 1;
                 }else{ //falling
-                    gamestate.player.displacementY += 1;
+                    gamestate.player.displacementY = 1;
                 }
             }
         }
