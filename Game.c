@@ -215,8 +215,8 @@ void ReadJoystickClient() {
     while (1) {
         GetJoystickCoordinates(&xCord, &yCord);
 
-        if (xCord < -1800) gamestate.player.displacementX = 2;
-        else if (xCord > 1800) gamestate.player.displacementX = -2;
+        if (xCord < -1800) gamestate.player.displacementX = 4;
+        else if (xCord > 1800) gamestate.player.displacementX = -4;
         else gamestate.player.displacementX = 0;
 
         // Sleep 10ms
@@ -350,8 +350,8 @@ void ReadJoystickHost() {
     while (1) {
         GetJoystickCoordinates(&xCord, &yCord);
 
-        if (xCord < -1800) displacement = 2;
-        else if (xCord > 1800) displacement = -2;
+        if (xCord < -1800) displacement = 4;
+        else if (xCord > 1800) displacement = -4;
         else displacement = 0;
 
         // Sleep to give fair advantage to client
@@ -395,7 +395,7 @@ void VerticalMovement()
         for(int i = 0; i < 50; i++){
             if(PLAYER == 0) gamestate.players[0].currentCenterY--;
             else gamestate.player.displacementY--;
-            G8RTOS_Sleep(7);
+            G8RTOS_Sleep(5);
         }
 
         P5->IFG &= ~BIT4;
